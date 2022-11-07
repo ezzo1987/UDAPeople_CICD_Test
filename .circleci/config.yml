@@ -68,6 +68,4 @@ workflows:
   default:
     jobs:
       - build-frontend
-      - build-backend      
-      - test-backend:
-        requires: [build-backend]
+      - build-backend
