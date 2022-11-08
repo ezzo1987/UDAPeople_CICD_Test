@@ -63,7 +63,7 @@ jobs:
             npm install
             npm run test
   
-  test2-backend:
+  scan-backend:
     docker:
       - image: cimg/node:16.16.0
     steps:
@@ -75,13 +75,13 @@ jobs:
           command: |
             cd backend
             npm install
-            npm run test
+            npm audit --audit-level=critical
   
 workflows:
   default:
     jobs:
       - build-frontend
       - build-backend      
-      - test2-backend:
+      - scan-backend:
           requires:
           - build-frontend      
