@@ -82,6 +82,6 @@ workflows:
     jobs:
       - build-frontend
       - build-backend      
-      - test2-frontend:
+      - test2-backend:
           requires:
           - build-frontend      
