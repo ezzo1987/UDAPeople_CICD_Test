@@ -63,25 +63,25 @@ jobs:
             npm install
             npm run test
   
-  scan-frontend:
+  test2-backend:
     docker:
       - image: cimg/node:16.16.0
     steps:
       - checkout
       - restore_cache:
-        keys: [frontend-build]
+          keys: [backend-build]
       - run:
-        name: Scan Front-End
-        command: |
-          cd frontend
-          npm install
-          npm audit --audit-level=critical  
+          name: Test Back-End
+          command: |
+            cd backend
+            npm install
+            npm run test
   
 workflows:
   default:
     jobs:
       - build-frontend
       - build-backend      
-      - scan-frontend:
+      - test2-frontend:
           requires:
           - build-frontend      
