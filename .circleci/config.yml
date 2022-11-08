@@ -1,4 +1,6 @@
 version: 2.1
+orbs:   #steps for connect slack email and massage 
+  slack: circleci/slack@4.10.1
           
 jobs:
   build-frontend:
@@ -78,6 +80,10 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --audit-level=critical --force
             npm audit --audit-level=critical
+      - slack/notify:
+          channel: circleci-udacity
+          event: fail
+          template: basic_fail_1
 
   scan-frontend:
     docker:
