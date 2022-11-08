@@ -20,7 +20,7 @@ jobs:
 
   build-backend:
     docker:
-      - image: cimg/node:18.12.0
+      - image: cimg/node:16.16.0
     steps:
       - checkout
       - restore_cache:
@@ -37,7 +37,7 @@ jobs:
 
   test-frontend:
     docker:
-      - image: cimg/node:18.12.0
+      - image: cimg/node:16.16.0
     steps:
       - checkout
       - restore_cache:
@@ -51,7 +51,7 @@ jobs:
                 
   test-backend:
     docker:
-      - image: cimg/node:18.12.0
+      - image: cimg/node:16.16.0
     steps:
       - checkout
       - restore_cache:
@@ -68,3 +68,10 @@ workflows:
   default:
     jobs:
       - build-frontend
+      - build-backend
+      - test-frontend:
+          requires:
+          - build-frontend
+      - test-backend
+          requires:
+          - build-backend
