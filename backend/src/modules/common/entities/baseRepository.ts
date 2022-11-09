@@ -79,8 +79,7 @@ export abstract class BaseRepository<TId, TEntity extends IAggregateRoot<TId>> {
   private createQueryOptions(): FindManyOptions<TEntity> {
     const where = this.createWhere();
     const relations = this.createRelations();
-    return {
-      where,
+    return {      
       relations,
     };
   }
