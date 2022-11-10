@@ -1,7 +1,22 @@
 version: 2.1
 orbs:   #steps for connect slack email and massage 
   slack: circleci/slack@4.10.1
-          
+
+commands:
+  destroy-environment:
+    description: Destroy Back-End & Front-End Cloudformation stacks given a workflow ID.
+    parameters:
+      workflow_id:
+        type: string
+    steps:
+      - run:
+          name: Destroy Environments
+          command: |
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<<parameters.workflow_id>>
+            aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id>>
+            aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive
+          when: on_fail
+
 jobs:
   build-frontend:
     docker:
@@ -77,8 +92,7 @@ jobs:
           command: |
             cd backend
             npm install  
-            npm audit fix --audit-level=critical --force
-            npm audit fix --audit-level=critical --force
+            npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
       - slack/notify:
           channel: circleci-udacity
@@ -97,17 +111,64 @@ jobs:
           command: |
             cd frontend
             npm install  
-            npm audit fix --audit-level=critical --force
-            npm audit fix --audit-level=critical --force
+            npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
-  
+
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar and gzip
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: Ensure Back-End Infrastructure Exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+              --tags project=udapeople
+      - run:
+          name: Ensure Front-End Infrastructure Exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
+              --tags project=udapeople
+      - run:
+          name: Add Back-End IP to Ansible Inventory
+          command: |
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
+            --output text >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+
+
 workflows:
   default:
     jobs:
+      - build-backend
       - build-frontend
+      - test-backend:
+          requires:
+          - build-backend 
       - test-frontend:
           requires:
-          - build-frontend      
+          - build-frontend
+      - scan-backend:
+          requires:
+          - build-backend 
       - scan-frontend:
           requires:
           - build-frontend
