@@ -4,22 +4,40 @@ orbs:   #steps for connect slack email and massage
 
 commands:
 
+  install_awscli:
+    description: Install AWS CLI v2
+    steps:
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+  install_ansible:
+    description: Install Ansible
+    steps:
+      - run:
+          name: Install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+  install_nodejs:
+    description: Install Node.js 13
+    steps:
+      - run:
+          name: Install Node.js 13
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
+
   destroy-environment:
     description: Destroy Back-End & Front-End Cloudformation stacks given a workflow ID.
     parameters:
       workflow_id:
         type: string
-    docker:
-      - image: cimg/node:16.16.0
-    steps:
-      - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install      
+    steps:      
       - run:
           name: Destroy Environments
           command: |
@@ -146,9 +164,10 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: amazon/aws-cli
+      - image: cimg/python:3.10
     steps:
       - checkout
+      - install_awscli
       - run:
           name: Install tar and gzip
           command: |
@@ -189,15 +208,13 @@ jobs:
       - image: python:3.7-alpine3.11
     steps:
       - checkout
+      - install_awscli
+      - install_ansible
       - run: apk add --update tar gzip
       - attach_workspace:
           at: ~/
       - add_ssh_keys:
-          fingerprints: ["b1:ca:3c:0f:a1:c2:f0:f4:5a:2f:16:04:e5:47:89:85"]
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update ansible
+          fingerprints: ["b1:ca:3c:0f:a1:c2:f0:f4:5a:2f:16:04:e5:47:89:85"]      
       - run:
           name: Configure server
           command: |
