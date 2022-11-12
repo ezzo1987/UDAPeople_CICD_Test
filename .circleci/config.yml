@@ -171,7 +171,7 @@ jobs:
       - run:
           name: Install tar and gzip
           command: |
-            apk add --update tar gzip
+            sudo apt-get install tar gzip -y
       - run:
           name: Ensure Back-End Infrastructure Exists
           command: |
