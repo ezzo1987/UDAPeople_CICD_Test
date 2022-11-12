@@ -4,25 +4,22 @@ orbs:   #steps for connect slack email and massage
 
 commands:
 
-  install_awscli:
-    description: Install AWS CLI
-    steps:
-      - run: sudo apt-get install tar gzip -y
-      - run:
-          name: Install AWS CLI
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-
   destroy-environment:
     description: Destroy Back-End & Front-End Cloudformation stacks given a workflow ID.
     parameters:
       workflow_id:
         type: string
+    docker:
+      - image: cimg/node:16.16.0
     steps:
-      - install_awscli
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install      
       - run:
           name: Destroy Environments
           command: |
