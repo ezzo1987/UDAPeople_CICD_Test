@@ -7,6 +7,7 @@ commands:
   install_awscli:
     description: Install AWS CLI
     steps:
+      - run: sudo apt-get install tar gzip -y
       - run:
           name: Install AWS CLI
           command: |
