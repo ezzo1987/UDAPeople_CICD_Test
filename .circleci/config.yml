@@ -13,6 +13,8 @@ commands:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install
+          name: Check AWS Version
+          command: |            
             aws --version
   install_ansible:
     description: Install Ansible
@@ -165,10 +167,9 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: cimg/python:3.10
+      - image: amazon/aws-cli
     steps:
       - checkout
-      - install_awscli
       - run:
           name: Install tar and gzip
           command: |
