@@ -33,8 +33,10 @@ commands:
       - run:
           name: Install Node.js 13
           command: |
-            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
             sudo apt install -y nodejs
+            sudo npm install --global n
+            sudo n 13.8.0
 
   destroy-environment:
     description: Destroy Back-End & Front-End Cloudformation stacks given a workflow ID.
@@ -287,10 +289,17 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: cimg/aws:2022.11
+      - image: cimg/python:3.10
     steps:
       - checkout
-      - run: sudo apt-get install tar gzip -y      
+      - run: sudo apt-get install tar gzip -y
+      - run:
+          name: Install AWS CLI v2
+          command: |
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
       - install_ansible
       - install_nodejs
       - add_ssh_keys:
