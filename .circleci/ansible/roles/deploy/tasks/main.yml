@@ -26,9 +26,9 @@
 #     chdir: /var/www
 
 - name: install NPM
-  shell: npm i
-  args:
-    chdir: /home/ubuntu
+  become: yes
+  shell: |
+    npm i
 
 - name: Install pm2
   become: yes
