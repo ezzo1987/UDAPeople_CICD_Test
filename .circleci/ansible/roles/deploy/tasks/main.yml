@@ -16,11 +16,19 @@
     name: nodejs
     state: latest
 
-- name: Install NPM
-  become: yes
-  apt: 
-    name: npm
-    state: latest
+
+# - name: NODE | Install npm deps
+#   shell: npm i
+#   register: npm_finished
+#   failed_when: '"ERR!" in npm_finished.stderr'
+#   when: git_finished.changed
+#   args:
+#     chdir: /var/www
+
+- name: install NPM
+  shell: npm i
+  args:
+    chdir: /home/ubuntu
 
 - name: Install pm2
   become: yes
