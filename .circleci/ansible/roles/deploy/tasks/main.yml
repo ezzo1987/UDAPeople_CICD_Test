@@ -9,6 +9,12 @@
   become: yes
   apt:
     autoremove: yes
+    
+- name: Extract artifacts
+  become: yes
+  unarchive:
+    src: files/artifact.tar.gz
+    dest: .
 
 - name: Install NodeJS
   become: yes
@@ -16,7 +22,14 @@
     name: nodejs
     state: latest
 
-
+- name: Start job 
+  become: yes  
+  shell: |
+    pwd
+    cd /home/ubuntu/backend
+    npm install
+    pm2 stop default
+    pm2 start npm -- start
 # - name: NODE | Install npm deps
 #   shell: npm i
 #   register: npm_finished
@@ -37,11 +50,7 @@
     global: yes
     production: yes
 
-- name: Extract artifacts
-  become: yes
-  unarchive:
-    src: files/artifact.tar.gz
-    dest: .
+
 
 - name: Start app
   become: yes
