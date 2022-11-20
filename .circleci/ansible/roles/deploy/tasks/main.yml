@@ -2,8 +2,8 @@
   file:
     path: /home/ubuntu/backend-artifact
     state: directory
-    
+
 - name: "Unarchive"
   unarchive:
-    src: artifact.tar.gz
+    src: .circleci/ansible/roles/deploy/files/artifact.tar.gz
     dest: /home/ubuntu/backend-artifact
