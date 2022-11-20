@@ -309,24 +309,17 @@ jobs:
           name:
           command: |
             cd backend
-            npm install
-      - run:
-          name: Package backend
-          command: |
-            cd backend
-            npm run build
-            tar -czvf artifact.tar.gz dist/* package*
-            cd .. 
-            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files            
+            npm install      
       - run:
           name: Deploy backend
           command: |
-            export TYPEORM_MIGRATIONS_DIR=./migrations
-            export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
-            export TYPEORM_MIGRATIONS=./migrations/*.ts
-            cd .circleci/ansible
-            echo "Contents  of the inventory file is -------"
-            cat inventory.txt
+            cd backend            
+            npm run build
+            cd ..
+            # zip backend
+            tar -C backend -czvf artifact.tar.gz .
+            ls -l artifact.tar.gz
+            pwd
             ansible-playbook deploy-backend.yml -i inventory.txt
 
 workflows:

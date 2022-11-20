@@ -1,59 +1,19 @@
----
-- name: Update and upgrade packages
-  become: yes
-  apt:
-    upgrade: yes
-    update_cache: yes
+- name: Copy backend files
+  become: true
+  copy:
+    src: /root/project/artifact.tar.gz
+    dest: /home/ubuntu/artifact.tar.gz
 
-- name: Remove unuse dependencies
-  become: yes
-  apt:
-    autoremove: yes
-    
-- name: Extract artifacts
-  become: yes
-  unarchive:
-    src: files/artifact.tar.gz
-    dest: .
-
-- name: Install NodeJS
-  become: yes
-  apt: 
-    name: nodejs
-    state: latest
-
-- name: Start job 
-  become: yes  
+- name: Prepare job
+  shell: |
+    cd /home/ubuntu/
+    tar xzvf artifact.tar.gz
+    pwd
+    ls -ltr
+- name: Start job   
   shell: |
     pwd
     cd /home/ubuntu/backend
     npm install
     pm2 stop default
-    pm2 start npm -- start
-# - name: NODE | Install npm deps
-#   shell: npm i
-#   register: npm_finished
-#   failed_when: '"ERR!" in npm_finished.stderr'
-#   when: git_finished.changed
-#   args:
-#     chdir: /var/www
-
-- name: install NPM
-  become: yes
-  shell: |
-    npm i
-
-- name: Install pm2
-  become: yes
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-
-
-
-- name: Start app
-  become: yes
-  shell: |
-    pm2 delete all
-    pm2 start npm -- start
+    pm2 start npm -- start 
