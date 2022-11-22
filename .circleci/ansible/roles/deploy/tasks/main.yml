@@ -1,21 +1,4 @@
 ---
-# - name: Update and upgrade packages
-#   become: yes
-#   apt:
-#     upgrade: yes
-#     update_cache: yes
-
-# - name: Remove unuse dependencies
-#   become: yes
-#   apt:
-#     autoremove: yes
-
-# - name: Install NodeJS
-#   become: yes
-#   apt: 
-#     name: nodejs
-#     state: latest
-
 - name: Create directory
   become: true
   file:
