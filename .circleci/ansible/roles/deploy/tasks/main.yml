@@ -10,14 +10,6 @@
     src: backend-artifact.tar.gz
     dest: /home/ubuntu/backend-artifact
 
-- name: "install pm2"
-  become: yes
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-    state: present
-
 - name: "Installing Node Dependencies"
   shell: |
     cd /home/ubuntu/backend-artifact
