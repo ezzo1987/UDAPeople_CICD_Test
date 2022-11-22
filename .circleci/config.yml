@@ -170,9 +170,10 @@ jobs:
 
   deploy-infrastructure:
     docker:
-      - image: amazon/aws-cli
+      - image: cimg/base:stable
     steps:
-      - checkout      
+      - checkout
+      - install_awscli
       - run:
           name: Install tar and gzip
           command: |
