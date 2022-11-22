@@ -17,12 +17,12 @@
 #     state: latest
 - name: "Create DIR for Test"
   shell: |
-    mkdir ~/backend-artifactII
+    mkdir /home/ubuntu/backend-artifactII
 
 - name: Creates directory
   become: true
   file:
-    path: ~/backend-artifact
+    path: /home/ubuntu/backend-artifact
     state: directory
 
 # - name: "Unarchive"
@@ -32,7 +32,7 @@
 
 - name: "Installing Node Dependencies"
   shell: |
-    cd ~/backend-artifact
+    cd /home/ubuntu/backend-artifact
     npm install
 
 # - name: "Executing Node app with PM2"
