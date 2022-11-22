@@ -34,6 +34,7 @@
 - name: "Executing Node app with PM2"
   shell: |
     cd ~/backend-artifact/dist
+    ls
     pm2 stop default
     pm2 start main.js
   register: execute_node
@@ -46,3 +47,4 @@
   become: true
   shell: |
     env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu
+    cd 
