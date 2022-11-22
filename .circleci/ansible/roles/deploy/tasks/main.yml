@@ -16,6 +16,12 @@
 #     name: nodejs
 #     state: latest
 
+- name: Create directory
+  become: true
+  file:
+    path: /home/ubuntu/backend-artifact
+    state: directory
+
 - name: "Unarchive"
   unarchive:
     src: backend-artifact.tar.gz
