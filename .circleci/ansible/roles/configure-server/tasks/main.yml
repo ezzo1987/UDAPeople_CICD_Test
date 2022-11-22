@@ -15,6 +15,12 @@
     name: pm2
     global: yes
 
+  - name: "move env vars"
+    become: true
+    copy:
+      src: prodenv.sh
+      dest: /etc/profile.d/
+
   environment:
     - TYPEORM_CONNECTION: "{{ lookup('env', 'TYPEORM_CONNECTION')}}"
     - TYPEORM_ENTITIES: "{{ lookup('env', 'TYPEORM_ENTITIES')}}"

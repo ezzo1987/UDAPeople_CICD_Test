@@ -6,3 +6,4 @@ export TYPEORM_PASSWORD=hihiAndhi1
 export TYPEORM_DATABASE=postgres
 export TYPEORM_MIGRATIONS=./migrations/*{.ts,.js}
 export TYPEORM_ENTITIES=./modules/domain/**/*.entity{.ts,.js}
+export TYPEORM_MIGRATIONS_DIR=./migrations
