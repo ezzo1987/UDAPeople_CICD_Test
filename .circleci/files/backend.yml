@@ -7,11 +7,13 @@ Parameters:
     Type: String
 
 Resources:
+
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Sub UdaPeople-${ID}
       GroupDescription: Allow Ports 22, 3030, 5432, 9100.
+      VpcId: vpc-099c8bcae9221f646
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
@@ -30,10 +32,10 @@ Resources:
           ToPort: 9100
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
-      - IpProtocol: tcp
-        FromPort: 0
-        ToPort: 65535
-        CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
 
   EC2Instance:
     Type: AWS::EC2::Instance
@@ -41,6 +43,7 @@ Resources:
       InstanceType: t2.micro
       NetworkInterfaces:
         - AssociatePublicIpAddress: "true"
+          DeviceIndex: "0"
           GroupSet:
             - !Ref InstanceSecurityGroup
       KeyName: udacity

@@ -1,39 +1,39 @@
 ---
-- name: Update and upgrade packages
-  become: yes
-  apt:
-    upgrade: yes
-    update_cache: yes
+# - name: Update and upgrade packages
+#   become: yes
+#   apt:
+#     upgrade: yes
+#     update_cache: yes
 
-- name: Remove unuse dependencies
-  become: yes
-  apt:
-    autoremove: yes
+# - name: Remove unuse dependencies
+#   become: yes
+#   apt:
+#     autoremove: yes
 
-- name: Install NodeJS
-  become: yes
-  apt: 
-    name: nodejs
-    state: latest
+# - name: Install NodeJS
+#   become: yes
+#   apt: 
+#     name: nodejs
+#     state: latest
 
 - name: Creates directory
   file:
-    path: /home/ubuntu/backend-artifact
+    path: ~/backend-artifact
     state: directory
 
 - name: "Unarchive"
   unarchive:
     src: backend-artifact.tar.gz
-    dest: /home/ubuntu/backend-artifact
+    dest: ~/backend-artifact
 
 - name: "Installing Node Dependencies"
   shell: |
-    cd /home/ubuntu/backend-artifact
+    cd ~/backend-artifact
     npm install
 
 - name: "Executing Node app with PM2"
   shell: |
-    cd /home/ubuntu/backend-artifact/dist
+    cd ~/backend-artifact/dist
     pm2 stop default
     pm2 start main.js
   register: execute_node
