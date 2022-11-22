@@ -15,16 +15,22 @@
 #   apt: 
 #     name: nodejs
 #     state: latest
+- name: "Create DIR for Test"
+  shell: |
+    mkdir ~/backend-artifactII
 
 - name: Creates directory
+  become: true
   file:
     path: ~/backend-artifact
     state: directory
+    remote_src: yes
 
 - name: "Unarchive"
   unarchive:
     src: backend-artifact.tar.gz
     dest: ~/backend-artifact
+    remote_src: yes
 
 - name: "Installing Node Dependencies"
   shell: |
@@ -33,8 +39,7 @@
 
 - name: "Executing Node app with PM2"
   shell: |
-    cd ~/backend-artifact/dist
-    ls
+    cd ~/backend-artifact/dist    
     pm2 stop default
     pm2 start main.js
   register: execute_node
