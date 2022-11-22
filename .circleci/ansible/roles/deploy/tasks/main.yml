@@ -24,13 +24,11 @@
   file:
     path: ~/backend-artifact
     state: directory
-    remote_src: yes
 
 - name: "Unarchive"
   unarchive:
     src: backend-artifact.tar.gz
     dest: ~/backend-artifact
-    remote_src: yes
 
 - name: "Installing Node Dependencies"
   shell: |
