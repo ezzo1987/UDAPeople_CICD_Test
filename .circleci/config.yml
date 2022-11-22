@@ -173,11 +173,7 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install_awscli
-      - run:
-          name: Install tar and gzip
-          command: |
-            yum install -y tar gzip
+      - install_awscli      
       - run:
           name: Ensure Back-End Infrastructure Exists
           command: |
