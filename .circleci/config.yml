@@ -23,7 +23,10 @@ commands:
       - run:
           name: Install Ansible
           command: |
-            python3 -m pip install --user ansible
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
   install_nodejs:
     description: Install Node.js 13
     steps:
@@ -420,7 +423,8 @@ jobs:
 
 workflows:
   default:
-    jobs:          
+    jobs:
+        - deploy-backend
       # - build-frontend
       # - build-backend
       # - test-frontend:
@@ -446,4 +450,5 @@ workflows:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
       #     requires: [run-migrations]
-      - deploy-backend  
+      # - deploy-backend:
+      #     requires: [run-migrations]
