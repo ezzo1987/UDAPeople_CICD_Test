@@ -32,7 +32,7 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup(`api/${apiVersionPrefix}`, app, document);
-  
+
   const config = app.get<ConfigService>(ConfigService);
   const whitelist = config.CORS_WHITELIST;
   const corsOptions = {
