@@ -1,5 +1,5 @@
 version: 2.1
-orbs:   #steps for connect slack email and massage 
+orbs:
   slack: circleci/slack@4.10.1
 
 commands:
@@ -17,6 +17,7 @@ commands:
           name: Check AWS Version
           command: |            
             aws --version
+  
   install_ansible:
     description: Install Ansible
     steps:
@@ -27,11 +28,12 @@ commands:
             sudo apt install software-properties-common -y
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
+  
   install_nodejs:
-    description: Install Node.js 13
+    description: Install Node.js 13.8.0
     steps:
       - run:
-          name: Install Node.js 13
+          name: Install Node.js 13.8.0
           command: |
             curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
             sudo apt install -y nodejs
@@ -72,9 +74,10 @@ commands:
             fi
 
 jobs:
+
   build-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -91,7 +94,7 @@ jobs:
 
   build-backend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -108,7 +111,7 @@ jobs:
 
   test-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -122,7 +125,7 @@ jobs:
                 
   test-backend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -136,7 +139,7 @@ jobs:
   
   scan-backend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -155,7 +158,7 @@ jobs:
 
   scan-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -181,7 +184,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}"  \
-              --tags project=udapeople
+              --tags Project=udapeople
       - run:
           name: Ensure Front-End Infrastructure Exists
           command: |
@@ -189,7 +192,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --stack-name "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:7}" \
-              --tags project=udapeople
+              --tags Project=udapeople
       - run:
           name: Add Back-End IP to Ansible Inventory
           command: |
@@ -207,7 +210,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - install_awscli
@@ -225,7 +228,7 @@ jobs:
 
   run-migrations:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - restore_cache:
@@ -259,7 +262,7 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - run: sudo apt-get install tar gzip -y
@@ -293,12 +296,11 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - run: sudo apt-get install tar gzip -y
-      - install_awscli
-      - install_nodejs
+      - install_awscli      
       - install_ansible          
       - attach_workspace:
           at: ~/
@@ -336,11 +338,10 @@ jobs:
 
   smoke-test:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/node:13.8.0
     steps:
       - checkout
-      - install_awscli
-      - install_nodejs
+      - install_awscli      
       - run:
           name: Backend smoke test.
           command: |
@@ -374,11 +375,10 @@ jobs:
   
   cloudfront-update:
     docker:
-      - image: cimg/base:stable
+      - image: cimg/node:13.8.0
     steps:
       - checkout
       - install_awscli
-      - install_nodejs
       - run:
           name: Save old Workflow ID to kvdb.io
           command: |            
@@ -394,7 +394,7 @@ jobs:
               --template-file .circleci/files/cloudfront.yml \
               --stack-name InitialStack \
               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
-              --tags project=udapeople
+              --tags Project=udapeople
             
             echo "Old Wokflow ID: $OLD_WORKFLOW_ID"            
             echo "Current Wokflow ID: ${CIRCLE_WORKFLOW_ID:0:7}"
@@ -405,11 +405,10 @@ jobs:
   
   cleanup: 
     docker:
-      - image: cimg/base:stable
+      - image: cimg/node:13.8.0
     steps:
       - checkout
-      - install_awscli
-      - install_nodejs
+      - install_awscli      
       - run:
           name: Remove old stacks and files
           command: |            
