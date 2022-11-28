@@ -257,7 +257,7 @@ jobs:
             else
               cd backend
               npm install
-              npm run migration:revert
+              npm run migrations:revert
               echo migration revert done.
             fi      
       - destroy-environment:
