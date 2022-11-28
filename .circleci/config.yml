@@ -244,9 +244,11 @@ jobs:
             cat migrations_dump.txt
       - run: 
           name: Send Migration Results to kvdb.io
-          command: |            
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+          command: |
+            cd backend            
+            if grep -q "has been executed successfully." migrations_dump.txt
             then
+              echo Send Migration Results to kvdb.io
               # If you are using kvdb.io, generate the bucket ID "ThNzefnaoNQE7o6rALsewZ" in your local terminal first
               curl https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
             fi
@@ -438,15 +440,12 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-backend
-      - test-backend:
-          requires: 
-            - build-backend
+      - build-backend      
       - scan-backend:
           requires: 
             - build-backend
       - deploy-infrastructure:
-          requires: [test-backend, scan-backend]
+          requires: [scan-backend]
           filters:
             branches:
               only: [master]
