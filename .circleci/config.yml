@@ -415,19 +415,16 @@ jobs:
           name: Remove old stacks and files
           command: |            
             export OLDWORKFLOWID=$(curl --insecure https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/old_workflow_id)
-            echo Old Workflow ID: $OLDWORKFLOWID 
+            echo Old Workflow ID: $OLDWORKFLOWID             
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             
             # Fetch the stack names 
             export STACKS=($(aws cloudformation list-stacks \
               --query "StackSummaries[*].StackName" \
               --stack-status-filter CREATE_COMPLETE --no-paginate --output text)) 
-            echo Stack names: ${STACKS[@]}
+            echo Stack names: ${STACKS[@]}            
             
-            echo ${STACKS[@]}
-            echo ${OLDWORKFLOWID}
-            
-            if [ ${STACKS[@]} != ${OLDWORKFLOWID} ]
+            if [ ${CIRCLE_WORKFLOW_ID:0:7} != ${OLDWORKFLOWID} ]
             then
               echo Start Cleaning.....
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
