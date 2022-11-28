@@ -63,18 +63,15 @@ commands:
       - run:
           name: Revert migrations
           when: on_fail
-          command: |
-            cd ~/project/backend
-            npm install
-            npm run migration:revert
-            # export SUCCESS=$(curl -k https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_<<parameters.workflow_id>>)
-            # echo $SUCCESS
-            # if(( $SUCCESS==1 )); 
-            # then
-            #  cd ~/project/backend
-            #  npm install
-            #  npm run migration:revert
-            # fi
+          command: |            
+            export SUCCESS=$(curl -k https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_<<parameters.workflow_id>>)
+            echo $SUCCESS
+            if(( $SUCCESS==1 )); 
+            then
+             cd ~/project/backend
+             npm install
+             npm run migration:revert
+            fi
 
 jobs:
 
@@ -213,7 +210,7 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: cimg/python:3.10
+      - image: cimg/base:stable
     steps:
       - checkout
       - install_awscli
@@ -238,13 +235,6 @@ jobs:
       - install_nodejs
       - restore_cache:
           keys: [backend-build]
-      # - run: 
-      #     name: Install aws cli
-      #     command: |            
-      #       sudo apt-get update && sudo apt-get install -yy less
-      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-      #       unzip awscliv2.zip
-      #       sudo ./aws/install
       - run:
           name: Run migrations
           command: |
@@ -254,15 +244,18 @@ jobs:
             cat migrations_dump.txt
       - run: 
           name: Send Migration Results to kvdb.io
-          command: |
+          command: |            
+            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            then
+              # If you are using kvdb.io, generate the bucket ID "ThNzefnaoNQE7o6rALsewZ" in your local terminal first
+              curl https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+            fi
+      - run: 
+          name: Migration Revert
+          command: |            
             cd backend
-            npm install --force
-            npm run migrations:revert            
-            # if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            # then
-            #   # If you are using kvdb.io, generate the bucket ID "ThNzefnaoNQE7o6rALsewZ" in your local terminal first
-            #   curl https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
-            # fi      
+            npm install
+            npm run migrations:revert
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
@@ -444,23 +437,16 @@ jobs:
 
 workflows:
   default:
-    jobs:          
-      - build-frontend
+    jobs:
       - build-backend
-      - test-frontend:
-          requires: 
-            - build-frontend
       - test-backend:
           requires: 
             - build-backend
       - scan-backend:
           requires: 
             - build-backend
-      - scan-frontend:
-          requires: 
-            - build-frontend
       - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          requires: [test-backend, scan-backend]
           filters:
             branches:
               only: [master]
@@ -468,13 +454,36 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
-      - smoke-test:
-          requires: [deploy-backend, deploy-frontend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - cleanup:
-          requires: [cloudfront-update]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: 
+      #       - build-frontend
+      # - test-backend:
+      #     requires: 
+      #       - build-backend
+      # - scan-backend:
+      #     requires: 
+      #       - build-backend
+      # - scan-frontend:
+      #     requires: 
+      #       - build-frontend
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      #     filters:
+      #       branches:
+      #         only: [master]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - smoke-test:
+      #     requires: [deploy-backend, deploy-frontend]
+      # - cloudfront-update:
+      #     requires: [smoke-test]
+      # - cleanup:
+      #     requires: [cloudfront-update]
