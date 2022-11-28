@@ -64,14 +64,17 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            export SUCCESS=$(curl -k https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_<<parameters.workflow_id>>)
-            echo $SUCCESS
-            if(( $SUCCESS==1 )); 
-            then
-             cd ~/project/backend
-             npm install
-             npm run migration:revert
-            fi
+            cd ~/project/backend
+            npm install
+            npm run migration:revert
+            # export SUCCESS=$(curl -k https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_<<parameters.workflow_id>>)
+            # echo $SUCCESS
+            # if(( $SUCCESS==1 )); 
+            # then
+            #  cd ~/project/backend
+            #  npm install
+            #  npm run migration:revert
+            # fi
 
 jobs:
 
@@ -228,18 +231,20 @@ jobs:
 
   run-migrations:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_awscli
+      - install_nodejs
       - restore_cache:
           keys: [backend-build]
-      - run: 
-          name: Install aws cli
-          command: |            
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+      # - run: 
+      #     name: Install aws cli
+      #     command: |            
+      #       sudo apt-get update && sudo apt-get install -yy less
+      #       curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+      #       unzip awscliv2.zip
+      #       sudo ./aws/install
       - run:
           name: Run migrations
           command: |
@@ -250,16 +255,14 @@ jobs:
       - run: 
           name: Send Migration Results to kvdb.io
           command: |
-            if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-            then
-              # If you are using kvdb.io, generate the bucket ID "ThNzefnaoNQE7o6rALsewZ" in your local terminal first
-              curl https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
-            else
-              cd backend
-              npm install
-              npm run migrations:revert
-              echo migration revert done.
-            fi      
+            cd backend
+            npm install --force
+            npm run migrations:revert            
+            # if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
+            # then
+            #   # If you are using kvdb.io, generate the bucket ID "ThNzefnaoNQE7o6rALsewZ" in your local terminal first
+            #   curl https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+            # fi      
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
@@ -465,13 +468,13 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
