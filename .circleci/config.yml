@@ -68,9 +68,10 @@ commands:
             echo $SUCCESS
             if(( $SUCCESS==1 )); 
             then
-             cd ~/project/backend
+             cd backend
              npm install
-             npm run migration:revert
+             npm run migrations:revert
+             echo done from revert migrations
             fi
 
 jobs:
@@ -251,13 +252,7 @@ jobs:
               echo Send Migration Results to kvdb.io
               # If you are using kvdb.io, generate the bucket ID "ThNzefnaoNQE7o6rALsewZ" in your local terminal first
               curl https://kvdb.io/ThNzefnaoNQE7o6rALsewZ/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
-            fi
-      - run: 
-          name: Migration Revert
-          command: |            
-            cd backend
-            npm install
-            npm run migrations:revert
+            fi      
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
       - revert-migrations:
@@ -439,13 +434,23 @@ jobs:
 
 workflows:
   default:
-    jobs:
-      - build-backend      
+    jobs:      
+      - build-frontend
+      - build-backend
+      - test-frontend:
+          requires: 
+            - build-frontend
+      - test-backend:
+          requires: 
+            - build-backend
       - scan-backend:
           requires: 
             - build-backend
+      - scan-frontend:
+          requires: 
+            - build-frontend
       - deploy-infrastructure:
-          requires: [scan-backend]
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
               only: [master]
@@ -453,36 +458,13 @@ workflows:
           requires: [deploy-infrastructure]
       - run-migrations:
           requires: [configure-infrastructure]
-      # - build-frontend
-      # - build-backend
-      # - test-frontend:
-      #     requires: 
-      #       - build-frontend
-      # - test-backend:
-      #     requires: 
-      #       - build-backend
-      # - scan-backend:
-      #     requires: 
-      #       - build-backend
-      # - scan-frontend:
-      #     requires: 
-      #       - build-frontend
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - deploy-frontend:
+          requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+      - cloudfront-update:
+          requires: [smoke-test]
+      - cleanup:
+          requires: [cloudfront-update]
