@@ -427,7 +427,7 @@ jobs:
             echo ${STACKS[@]}
             echo ${OLDWORKFLOWID}
             
-            if [[ ${STACKS[@]} != ${OLDWORKFLOWID} ]]
+            if [ ${STACKS[@]} != ${OLDWORKFLOWID} ]
             then
               echo Start Cleaning.....
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
