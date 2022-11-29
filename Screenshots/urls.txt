@@ -2,13 +2,13 @@
 https://github.com/ezzo1987/UDAPeople_CICD_Test/
 *********************************************************************************
 2- Public URL for your S3 Bucket (aka, your green candidate front-end) [URL02]
-http://udapeople-d470c0e.s3.amazonaws.com/index.html
+http://udapeople-d3469c3.s3.amazonaws.com/index.html
 *********************************************************************************
 3- CloudFront (your production front-end). [URL03]
 http://dmtzfcbdhdfsg.cloudfront.net
 *********************************************************************************
 4- Backend API [URL04]
-http://54.147.110.129:3030/api/status
+http://52.22.207.106:3030/api/status
 *********************************************************************************
 5- Prometheus server showing UP state [URL05]
 http://52.91.190.25:9090/targets

@@ -1,3 +1,4 @@
+export NODE_ENV=production
 export TYPEORM_CONNECTION=postgres
 export TYPEORM_HOST=udapeople-prod.cs9hpqwsqqjn.us-east-1.rds.amazonaws.com
 export TYPEORM_PORT=5432
