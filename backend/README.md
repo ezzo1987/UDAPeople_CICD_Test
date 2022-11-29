@@ -184,3 +184,6 @@ curl --request POST \
 (This only works with an "API" in Auth0. It will not work with an "Application" in Auth0 because they disable `client_credentials` grants by default and we have not found a way to enable that.)
 
 To switch your backend to use the "Application" in Auth0, you should simply change the clientId, clientSecret, and audience in your environment variables.
+
+Fix the issue of start PM2 after reboting server:
+npm install -g Unitech/pm2#development && pm2 update
