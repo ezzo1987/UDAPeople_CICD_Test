@@ -78,9 +78,10 @@ jobs:
 
   build-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_nodejs
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -113,9 +114,10 @@ jobs:
 
   test-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_nodejs
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -127,9 +129,10 @@ jobs:
                 
   test-backend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_nodejs
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -141,9 +144,10 @@ jobs:
   
   scan-backend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_nodejs
       - restore_cache:
           keys: [backend-build]
       - run:
@@ -160,9 +164,10 @@ jobs:
 
   scan-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_nodejs
       - restore_cache:
           keys: [frontend-build]
       - run:
@@ -261,19 +266,14 @@ jobs:
 
   deploy-frontend:
     docker:
-      - image: cimg/node:16.16.0
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_awscli
+      - install_nodejs
       - run: sudo apt-get install tar gzip -y
       - restore_cache:
           keys: [frontend-build]
-      - run:
-          name: Install dependencies
-          command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
       - run:
           name: Get backend url
           command: |
