@@ -9,10 +9,10 @@
     "test:watch": "jest --watch",
     "pretest:cov": "npm run lint",
     "test:cov": "jest --coverage",
-    "start": "set NODE_OPTIONS=--openssl-legacy-provider && webpack-dev-server --mode development --hot --progress --colors --port 3000 --open",
+    "start": "webpack-dev-server --mode development --hot --progress --color --port 3000 --open",
     "lint": "tslint -p tsconfig.json -c tslint.json",
-    "build:prod": "set NODE_OPTIONS=--openssl-legacy-provider && webpack -p --progress --colors",
-    "build": "set NODE_OPTIONS=--openssl-legacy-provider && webpack --mode development --progress --colors",
+    "build:prod": "webpack -p --progress --colors",
+    "build": "webpack --mode development --progress --colors",
     "format": "prettier --write \"src/**/*.{ts,tsx,css}\""
   },
   "license": "MIT",
@@ -105,9 +105,6 @@
     "redux-actions": "^2.6.5",
     "redux-thunk": "^2.3.0",
     "sweetalert2": "^8.13.4"
-  },
-  "resolutions": {
-    "minimist": "1.2.6"
   },
   "jest": {
     "rootDir": "src",

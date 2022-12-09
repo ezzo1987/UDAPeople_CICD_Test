@@ -13,7 +13,7 @@
 - name: "Installing Node Dependencies"
   shell: |
     cd /home/ubuntu/backend-artifact
-    npm install
+    npm install --force
 
 - name: "Executing Node app with PM2"
   args:
